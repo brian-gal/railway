@@ -18,6 +18,19 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get("/db-test", async (req, res) => {
+    try {
+        const [rows] = await pool.query("SELECT 1 AS test");
+        res.json({ status: "ok", db: rows[0].test });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            status: "error",
+            message: err.message
+        });
+    }
+});
+
 // Arranque del servidor
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en puerto ${PORT}`);
