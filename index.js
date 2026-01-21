@@ -18,8 +18,6 @@ app.get("/", (req, res) => {
     });
 });
 
-const pool = require("./db");
-
 app.get("/db-test", async (req, res) => {
     try {
         const [rows] = await pool.query("SELECT 1 AS ok");
