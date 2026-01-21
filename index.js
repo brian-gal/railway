@@ -12,6 +12,48 @@ app.get("/", (req, res) => {
     });
 });
 
+const net = require("net");
+
+app.get("/env-dump", (req, res) => {
+    res.json({
+        MYSQLHOST: process.env.MYSQLHOST || null,
+        MYSQLPORT: process.env.MYSQLPORT || null,
+        MYSQLUSER: process.env.MYSQLUSER || null,
+        MYSQLPASSWORD: process.env.MYSQLPASSWORD || null,
+        MYSQLDATABASE: process.env.MYSQLDATABASE || null,
+        MYSQL_URL: process.env.MYSQL_URL || null,
+    });
+});
+
+app.get("/tcp-test", async (req, res) => {
+    const host = process.env.MYSQLHOST;
+    const port = Number(process.env.MYSQLPORT);
+
+    if (!host || !port) {
+        return res.status(400).json({ ok: false, error: "Falta MYSQLHOST o MYSQLPORT", host, port });
+    }
+
+    const socket = new net.Socket();
+    const timeoutMs = 5000;
+
+    const result = await new Promise((resolve) => {
+        const done = (payload) => {
+            try { socket.destroy(); } catch { }
+            resolve(payload);
+        };
+
+        socket.setTimeout(timeoutMs);
+
+        socket.once("connect", () => done({ ok: true, host, port, message: "TCP connect OK" }));
+        socket.once("timeout", () => done({ ok: false, host, port, error: "TIMEOUT" }));
+        socket.once("error", (err) => done({ ok: false, host, port, error: err.code || err.message }));
+        socket.connect(port, host);
+    });
+
+    res.json(result);
+});
+
+
 app.get("/db-test", async (req, res) => {
     try {
         const [rows] = await pool.query("SELECT 1 AS ok");
