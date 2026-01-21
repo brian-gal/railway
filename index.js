@@ -8,7 +8,7 @@ const pool = require("./db");
 app.get("/", (req, res) => {
     res.json({
         status: "ok",
-        message: "Backend POC funcionando en Railway"
+        message: "Backend POC funcionando en Railway",
     });
 });
 
@@ -22,7 +22,7 @@ app.get("/db-test", async (req, res) => {
             status: "error",
             message: err?.message || null,
             code: err?.code || null,
-            errno: err?.errno || null
+            errno: err?.errno || null,
         });
     }
 });
@@ -34,7 +34,6 @@ app.get("/env-check", (req, res) => {
         MYSQLUSER: !!process.env.MYSQLUSER,
         MYSQLPASSWORD: !!process.env.MYSQLPASSWORD,
         MYSQLDATABASE: !!process.env.MYSQLDATABASE,
-        MYSQL_URL: !!process.env.MYSQL_URL
     });
 });
 
